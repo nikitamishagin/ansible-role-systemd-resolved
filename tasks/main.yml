@@ -1,66 +1,12 @@
 ---
+- name: Install and configure Systemd Resolved
+  ansible.builtin.include_tasks:
+    file: install.yml
+  when:
+    - not systemd_resolved_remove
 
-- name: install systemd
-  ansible.builtin.package:
-    name: systemd
-    state: present
-
-- name: configure systemd-resolved
-  ansible.builtin.template:
-    src: resolved.conf.j2
-    dest: /etc/systemd/resolved.conf
-    owner: root
-    group: root
-    mode: 0644
-  become: yes
-  register: __systemd_resolved_configuration
-
-- name: enable systemd-resolved service and assure it is started
-  ansible.builtin.systemd:
-    name: systemd-resolved
-    enabled: yes
-    state: >-
-      {{
-        __systemd_resolved_configuration.changed |
-          default(False) |
-          ternary("restarted", "started")
-      }}
-  become: yes
-
-- name: remove /etc/resolve.conf mount if running in container
-  ansible.posix.mount:
-    path: /etc/resolv.conf
-    state: unmounted
-  become: yes
-  when: >-
-    ansible_mounts |
-      selectattr('mount', 'equalto', '/etc/resolv.conf') |
-      length
-
-- name: check /etc/resolv.conf
-  ansible.builtin.stat:
-    path: /etc/resolv.conf
-    get_checksum: no
-    get_mime: no
-  register: __etc_resolv_conf
-
-- name: remove /etc/resolve.conf if not yet linked
-  ansible.builtin.file:
-    path: /etc/resolv.conf
-    state: absent
-  become: yes
-  when: >-
-    not __etc_resolv_conf.stat.islnk
-    or
-    not __etc_resolv_conf.stat.lnk_target | default('') ==
-        '/run/systemd/resolve/stub-resolv.conf'
-
-- name: link /etc/resolv.conf to stub
-  ansible.builtin.file:
-    src: /run/systemd/resolve/stub-resolv.conf
-    dest: /etc/resolv.conf
-    state: link
-    force: yes
-  become: yes
-
-...
+- name: Stop and remove Systemd Resolved
+  ansible.builtin.include_tasks:
+    file: remove.yml
+  when:
+    - systemd_resolved_remove

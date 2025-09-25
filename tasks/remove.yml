@@ -1,0 +1,17 @@
+---
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Disable and stop Systemd Resolved service
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    enabled: false
+    state: stopped
+  when: "'systemd-resolved.service' in ansible_facts.services"
+  become: true
+
+- name: Remove Systemd Resolved package
+  ansible.builtin.package:
+    name: systemd-resolved
+    state: absent
+  become: true
