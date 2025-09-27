@@ -3,6 +3,7 @@
   ansible.builtin.package:
     name: systemd-resolved
     state: present
+    update_cache: "{{ systemd_resolved_update_cache | bool }}"
   become: true
 
 - name: Configure Systemd Resolved
