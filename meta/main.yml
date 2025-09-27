@@ -1,24 +1,12 @@
 ---
-
-dependencies: []
-
 galaxy_info:
   role_name: systemd_resolved
-  namespace: idiv_biodiversity
-
-  author: Christian Krause
-  description: 'install and configure systemd-resolved'
-  company: German Centre for Integrative Biodiversity Research (iDiv)
+  namespace: nikitamishagin
+  author: Nikita Mishagin
+  description: Manage systemd-resolved (install/configure or disable/remove)
   license: MIT
-  min_ansible_version: '2.9'
-
-  platforms:
-    - name: ArchLinux
-      versions:
-        - all
-
+  min_ansible_version: '2.18'
   galaxy_tags:
     - systemd
     - resolved
-
-...
+dependencies: []
